@@ -132,7 +132,7 @@ class BankingSystemApplicationTests {
     @Test
     void deposit_money_negative_input() {
         Long accountId = 8567578311883312306L;
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> bank.depositMoney(accountId, -154.75f), "expected getAccount to throw exception but didn't");
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> bank.depositMoney(accountId, -154.75f), "expected deposit money to throw exception but didn't");
         assertEquals("Amount should not be negative or null", illegalArgumentException.getMessage());
     }
 
@@ -159,14 +159,64 @@ class BankingSystemApplicationTests {
     @Test
     void withdraw_money_negative_input() {
         Long accountId = 8567578311883312306L;
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> bank.withdrawMoney(accountId, -154.75f), "expected getAccount to throw exception but didn't");
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> bank.withdrawMoney(accountId, -154.75f), "expected withdraw money to throw exception but didn't");
         assertEquals("Amount should not be negative or null", illegalArgumentException.getMessage());
+    }
+
+    @Test
+    void withdraw_money_not_enough_balance() {
+        Long accountId = 8567578311883312306L;
+        boolean withdrawMoney = bank.withdrawMoney(accountId, 5000.0f);
+        assertFalse(withdrawMoney, "withdraw money should fail but didn't");
     }
 
     @Test
     void withdraw_money_non_existed_account() {
         boolean succeeded = bank.withdrawMoney(1L, 154.75f);
         assertFalse(succeeded, "deposit should fail for a non existing account");
+    }
+
+    @Test
+    void transfer_money() {
+        var sourceAccount = 5323523150815117423L;
+        var destinationAccount = 8567578311883312306L;
+
+        boolean succeeded = bank.transferMoney(sourceAccount, destinationAccount, 250.0f);
+        assertTrue(succeeded, "transferring money must be successful");
+
+        Account account1 = bank.getAccount(sourceAccount);
+        System.out.println("account = " + account1);
+        assertEquals(sourceAccount, account1.getAccountId(), "generated Id when persisting must be the same when account is fetched");
+        assertEquals(2000.0f, account1.getAmount(), "amount must be 2000");
+
+        Account account2 = bank.getAccount(destinationAccount);
+        System.out.println("account = " + account2);
+        assertEquals(destinationAccount, account2.getAccountId(), "generated Id when persisting must be the same when account is fetched");
+        assertEquals(3154.75f, account2.getAmount(), "amount must be 3154.75");
+    }
+
+    @Test
+    void transfer_money_non_existed_account() {
+        var sourceAccount = 1L;
+        var destinationAccount = 8567578311883312306L;
+        boolean succeeded = bank.transferMoney(sourceAccount, destinationAccount, 154.75f);
+        assertFalse(succeeded, "transfer should fail for a non existing account");
+    }
+
+    @Test
+    void transfer_money_negative_input() {
+        var sourceAccount = 5323523150815117423L;
+        var destinationAccount = 8567578311883312306L;
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> bank.transferMoney(sourceAccount, destinationAccount, -154.75f), "expected getAccount to throw exception but didn't");
+        assertEquals("Amount should not be negative or null", illegalArgumentException.getMessage());
+    }
+
+    @Test
+    void transfer_money_not_enough_balance() {
+        var sourceAccount = 5323523150815117423L;
+        var destinationAccount = 8567578311883312306L;
+        boolean succeeded = bank.transferMoney(sourceAccount, destinationAccount, 3000.0f);
+        assertFalse(succeeded, "transfer should fail for when source account doesn't have enough money");
     }
 
 }

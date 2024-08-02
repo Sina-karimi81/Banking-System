@@ -19,7 +19,7 @@ public class Bank {
         this.bankAccountRepository = bankAccountRepository;
     }
 
-    public Long createAccount(AccountCreationInputDTO accountInfo) {
+    public Long createAccount(AccountCreationInputDTO accountInfo) throws IllegalArgumentException {
         if (accountInfo.getOwnerName() == null || accountInfo.getOwnerName().isEmpty()) {
             throw new IllegalArgumentException("Owner's name should not be blank");
         }
@@ -39,12 +39,12 @@ public class Bank {
 
             return savedAccount.getId();
         } catch (Exception e) {
-            System.out.println("exception occurred while trying to save account");
+            System.out.println("exception occurred while trying to save account to database");
             return null;
         }
     }
 
-    public Account getAccount(Long accountId) {
+    public Account getAccount(Long accountId) throws IllegalArgumentException {
         if (accountId == null || accountId < 0) {
             throw new IllegalArgumentException("Account Id must be given in order to fetch the account data and must not be null");
         }
@@ -63,12 +63,12 @@ public class Bank {
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("exception occurred while trying to get account: " + accountId);
+            System.out.println("exception occurred while trying to get account: " + accountId + " from database");
             return null;
         }
     }
 
-    public boolean depositMoney(Long accountId, Float amount) {
+    public boolean depositMoney(Long accountId, Float amount) throws IllegalArgumentException {
         if (amount == null || amount < 0) {
             throw new IllegalArgumentException("Amount should not be negative or null");
         }
@@ -86,12 +86,12 @@ public class Bank {
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("exception occurred while trying to deposit money to account: " + accountId);
+            System.out.println("exception occurred while trying to deposit money to account: " + accountId + " to database");
             return false;
         }
     }
 
-    public boolean withdrawMoney(Long accountId, Float amount) {
+    public boolean withdrawMoney(Long accountId, Float amount) throws IllegalArgumentException {
         if (amount == null || amount < 0) {
             throw new IllegalArgumentException("Amount should not be negative or null");
         }
@@ -100,18 +100,34 @@ public class Bank {
             Optional<BankAccount> accountById = bankAccountRepository.findById(accountId);
             if (accountById.isPresent()) {
                 BankAccount a = accountById.get();
-                a.setAmount(a.getAmount() - amount);
+                if (a.getAmount() >= amount) {
+                    a.setAmount(a.getAmount() - amount);
 
-                bankAccountRepository.save(a);
+                    bankAccountRepository.save(a);
 
-                return true;
+                    return true;
+                } else {
+                    System.out.println("Not Enough Balance!!!! in account: " + accountId);
+                    return false;
+                }
             } else {
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("exception occurred while trying to withdraw money to account: " + accountId);
+            System.out.println("exception occurred while trying to withdraw money from account: " + accountId + " to database");
             return false;
         }
+    }
+
+    public boolean transferMoney(Long sourceAccount, Long destinationAccount, Float amount) {
+        if (amount == null || amount < 0) {
+            throw new IllegalArgumentException("Amount should not be negative or null");
+        }
+
+        boolean withdrawMoneyFromSource = withdrawMoney(sourceAccount, amount);
+        boolean depositMoneyToDestination = depositMoney(destinationAccount, amount);
+
+        return withdrawMoneyFromSource && depositMoneyToDestination;
     }
 
 }
