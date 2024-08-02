@@ -18,11 +18,16 @@ public class AccountCommands {
         this.bank = bank;
     }
 
+    @ShellMethod(key = "list", value = "lists all accounts")
+    public void list() {
+        bank.listAllAccounts();
+    }
+
     @ShellMethod(key = "create", value = "creates an account for the user")
     public void create(@ShellOption(value = "-n", help = "account owner's name") String ownerName,
                        @ShellOption(value = "-b", help = "initial balance of the account")  Float initialBalance) {
         try {
-            Long accountId = bank.createAccount(new AccountCreationInputDTO(ownerName, initialBalance));
+            String accountId = bank.createAccount(new AccountCreationInputDTO(ownerName, initialBalance));
             System.out.println("accountId = " + accountId);
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
@@ -30,7 +35,7 @@ public class AccountCommands {
     }
 
     @ShellMethod(key = "balance", value = "shows an account's balance to the user")
-    public void balance(@ShellOption(value = "-a", help = "user's account id") Long accountId) {
+    public void balance(@ShellOption(value = "-a", help = "user's account id") String accountId) {
         try {
             Account account = bank.getAccount(accountId);
             if (account == null) {
@@ -44,7 +49,7 @@ public class AccountCommands {
     }
 
     @ShellMethod(key = "deposit", value = "deposit money to an account")
-    public void deposit(@ShellOption(value = "-a", help = "user's account id") Long accountId,
+    public void deposit(@ShellOption(value = "-a", help = "user's account id") String accountId,
                         @ShellOption(value = "-m", help = "the amount to be deposited") Float amount) {
         try {
             if (bank.depositMoney(accountId, amount)) {
@@ -58,7 +63,7 @@ public class AccountCommands {
     }
 
     @ShellMethod(key = "withdraw", value = "deposit money from an account")
-    public void withdraw(@ShellOption(value = "-a", help = "user's account id") Long accountId,
+    public void withdraw(@ShellOption(value = "-a", help = "user's account id") String accountId,
                          @ShellOption(value = "-m", help = "the amount to be withdrawn") Float amount) {
         try {
             if (bank.withdrawMoney(accountId, amount)) {
@@ -72,8 +77,8 @@ public class AccountCommands {
     }
 
     @ShellMethod(key = "transfer", value = "transfer money from one account to another")
-    public void transfer(@ShellOption(value = "-s", help = "source account where the money is going to be withdrawn") Long sourceAccountId,
-                         @ShellOption(value = "-d", help = "destination account where the money is going to be deposited") Long destinationAccountId,
+    public void transfer(@ShellOption(value = "-s", help = "source account where the money is going to be withdrawn") String sourceAccountId,
+                         @ShellOption(value = "-d", help = "destination account where the money is going to be deposited") String destinationAccountId,
                          @ShellOption(value = "-m", help = "amount of money that is going to be transferred") Float amount) {
         try {
             if (bank.transferMoney(sourceAccountId, destinationAccountId, amount)) {

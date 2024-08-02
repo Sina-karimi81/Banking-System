@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @ToString
 public class Account {
-    private Long accountId;
+    private String accountId;
     private String ownerName;
     private Float amount;
 }

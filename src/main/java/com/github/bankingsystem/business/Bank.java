@@ -2,24 +2,41 @@ package com.github.bankingsystem.business;
 
 import com.github.bankingsystem.api.Account;
 import com.github.bankingsystem.api.AccountCreationInputDTO;
+import com.github.bankingsystem.business.transactions.TransactionFactory;
 import com.github.bankingsystem.business.util.IdGenerator;
+import com.github.bankingsystem.business.util.TableGenerator;
 import com.github.bankingsystem.database.entity.BankAccount;
 import com.github.bankingsystem.database.repository.BankAccountRepository;
+import com.github.bankingsystem.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.shell.table.TableBuilder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class Bank {
     private final BankAccountRepository bankAccountRepository;
+    private final TransactionFactory transactionFactory;
 
     @Autowired
-    public Bank(BankAccountRepository bankAccountRepository) {
+    public Bank(BankAccountRepository bankAccountRepository, TransactionFactory transactionFactory) {
         this.bankAccountRepository = bankAccountRepository;
+        this.transactionFactory = transactionFactory;
     }
 
-    public Long createAccount(AccountCreationInputDTO accountInfo) throws IllegalArgumentException {
+    public void listAllAccounts() {
+        try {
+            List<BankAccount> all = bankAccountRepository.findAll();
+            TableBuilder tableBuilder = TableGenerator.listToArrayTableModel(all);
+            System.out.println(tableBuilder.build().render(120));
+        } catch (Exception e) {
+            System.out.println("exception occurred while trying to get all accounts from, database: \n" + e.getMessage());
+        }
+    }
+
+    public String createAccount(AccountCreationInputDTO accountInfo) throws IllegalArgumentException {
         if (accountInfo.getOwnerName() == null || accountInfo.getOwnerName().isEmpty()) {
             throw new IllegalArgumentException("Owner's name should not be blank");
         }
@@ -44,8 +61,8 @@ public class Bank {
         }
     }
 
-    public Account getAccount(Long accountId) throws IllegalArgumentException {
-        if (accountId == null || accountId < 0) {
+    public Account getAccount(String accountId) throws IllegalArgumentException {
+        if (accountId == null || accountId.isEmpty()) {
             throw new IllegalArgumentException("Account Id must be given in order to fetch the account data and must not be null");
         }
 
@@ -68,66 +85,19 @@ public class Bank {
         }
     }
 
-    public boolean depositMoney(Long accountId, Float amount) throws IllegalArgumentException {
-        if (amount == null || amount < 0) {
-            throw new IllegalArgumentException("Amount should not be negative or null");
-        }
-
-        try {
-            Optional<BankAccount> accountById = bankAccountRepository.findById(accountId);
-            if (accountById.isPresent()) {
-                BankAccount a = accountById.get();
-                a.setAmount(a.getAmount() + amount);
-
-                bankAccountRepository.save(a);
-
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            System.out.println("exception occurred while trying to deposit money to account: " + accountId + " to database: " + e.getMessage());
-            return false;
-        }
+    public boolean depositMoney(String accountId, Float amount) throws IllegalArgumentException {
+        return transactionFactory.getTransaction(TransactionType.DEPOSIT.name())
+                .performTransaction(accountId, amount);
     }
 
-    public boolean withdrawMoney(Long accountId, Float amount) throws IllegalArgumentException {
-        if (amount == null || amount < 0) {
-            throw new IllegalArgumentException("Amount should not be negative or null");
-        }
-
-        try {
-            Optional<BankAccount> accountById = bankAccountRepository.findById(accountId);
-            if (accountById.isPresent()) {
-                BankAccount a = accountById.get();
-                if (a.getAmount() >= amount) {
-                    a.setAmount(a.getAmount() - amount);
-
-                    bankAccountRepository.save(a);
-
-                    return true;
-                } else {
-                    System.out.println("Not Enough Balance!!!! in account: " + accountId);
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            System.out.println("exception occurred while trying to withdraw money from account: " + accountId + " to database: " + e.getMessage());
-            return false;
-        }
+    public boolean withdrawMoney(String accountId, Float amount) throws IllegalArgumentException {
+        return transactionFactory.getTransaction(TransactionType.WITHDRAW.name())
+                .performTransaction(accountId, amount);
     }
 
-    public boolean transferMoney(Long sourceAccount, Long destinationAccount, Float amount) {
-        if (amount == null || amount < 0) {
-            throw new IllegalArgumentException("Amount should not be negative or null");
-        }
-
-        boolean withdrawMoneyFromSource = withdrawMoney(sourceAccount, amount);
-        boolean depositMoneyToDestination = depositMoney(destinationAccount, amount);
-
-        return withdrawMoneyFromSource && depositMoneyToDestination;
+    public boolean transferMoney(String sourceAccount, String destinationAccount, Float amount) {
+        return transactionFactory.getTransaction(TransactionType.TRANSFER.name())
+                .performTransaction(sourceAccount + "-" + destinationAccount, amount);
     }
 
 }

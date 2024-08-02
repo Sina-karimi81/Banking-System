@@ -26,7 +26,7 @@ class BankingSystemApplicationTests {
                 .amount(1000f)
                 .build();
 
-        Long generatedId = bank.createAccount(account);
+        String generatedId = bank.createAccount(account);
         assertNotNull(generatedId, "an Id must be generated for the account");
         System.out.println("generatedId = " + generatedId);
     }
@@ -57,7 +57,7 @@ class BankingSystemApplicationTests {
                 .amount(1000f)
                 .build();
 
-        Long generatedId1 = bank.createAccount(account1);
+        String generatedId1 = bank.createAccount(account1);
         assertNotNull(generatedId1, "an Id must be generated for the account");
         System.out.println("generatedId = " + generatedId1);
 
@@ -66,7 +66,7 @@ class BankingSystemApplicationTests {
                 .amount(1000f)
                 .build();
 
-        Long generatedId2 = bank.createAccount(account2);
+        String generatedId2 = bank.createAccount(account2);
         assertNotNull(generatedId2, "an Id must be generated for the account");
         System.out.println("generatedId = " + generatedId2);
 
@@ -75,7 +75,7 @@ class BankingSystemApplicationTests {
                 .amount(1000f)
                 .build();
 
-        Long generatedId3 = bank.createAccount(account3);
+        String generatedId3 = bank.createAccount(account3);
         assertNotNull(generatedId3, "an Id must be generated for the account");
         System.out.println("generatedId = " + generatedId3);
 
@@ -91,7 +91,7 @@ class BankingSystemApplicationTests {
                 .amount(2500f)
                 .build();
 
-        Long accountId = bank.createAccount(inputAccountInfo);
+        String accountId = bank.createAccount(inputAccountInfo);
         assertNotNull(accountId, "an Id must be generated for the account");
         System.out.println("accountId = " + accountId);
 
@@ -105,7 +105,7 @@ class BankingSystemApplicationTests {
 
     @Test
     void get_non_existed_account() {
-        Account account = bank.getAccount(1L);
+        Account account = bank.getAccount("1");
         assertNull(account, "received account must be null since no account with given id: " + 1 + " doesn't exist");
     }
 
@@ -117,7 +117,7 @@ class BankingSystemApplicationTests {
 
     @Test
     void deposit_money() {
-        Long accountId = 5323523150815117423L;
+        String accountId = "5323523150815117423";
 
         boolean succeeded = bank.depositMoney(accountId, 154.75f);
         assertTrue(succeeded, "depositing money must be successful");
@@ -131,20 +131,20 @@ class BankingSystemApplicationTests {
 
     @Test
     void deposit_money_negative_input() {
-        Long accountId = 8567578311883312306L;
+        String accountId = "8567578311883312306";
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> bank.depositMoney(accountId, -154.75f), "expected deposit money to throw exception but didn't");
         assertEquals("Amount should not be negative or null", illegalArgumentException.getMessage());
     }
 
     @Test
     void deposit_money_non_existed_account() {
-        boolean succeeded = bank.depositMoney(1L, 154.75f);
+        boolean succeeded = bank.depositMoney("1", 154.75f);
         assertFalse(succeeded, "deposit should fail for a non existing account");
     }
 
     @Test
     void withdraw_money() {
-        Long accountId = 5323523150815117423L;
+        String accountId = "5323523150815117423";
 
         boolean succeeded = bank.withdrawMoney(accountId, 154.75f);
         assertTrue(succeeded, "depositing money must be successful");
@@ -158,28 +158,28 @@ class BankingSystemApplicationTests {
 
     @Test
     void withdraw_money_negative_input() {
-        Long accountId = 8567578311883312306L;
+        String accountId = "8567578311883312306";
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> bank.withdrawMoney(accountId, -154.75f), "expected withdraw money to throw exception but didn't");
         assertEquals("Amount should not be negative or null", illegalArgumentException.getMessage());
     }
 
     @Test
     void withdraw_money_not_enough_balance() {
-        Long accountId = 8567578311883312306L;
+        String accountId = "8567578311883312306";
         boolean withdrawMoney = bank.withdrawMoney(accountId, 5000.0f);
         assertFalse(withdrawMoney, "withdraw money should fail but didn't");
     }
 
     @Test
     void withdraw_money_non_existed_account() {
-        boolean succeeded = bank.withdrawMoney(1L, 154.75f);
+        boolean succeeded = bank.withdrawMoney("1", 154.75f);
         assertFalse(succeeded, "deposit should fail for a non existing account");
     }
 
     @Test
     void transfer_money() {
-        var sourceAccount = 5323523150815117423L;
-        var destinationAccount = 8567578311883312306L;
+        var sourceAccount = "5323523150815117423";
+        var destinationAccount = "8567578311883312306";
 
         boolean succeeded = bank.transferMoney(sourceAccount, destinationAccount, 250.0f);
         assertTrue(succeeded, "transferring money must be successful");
@@ -197,24 +197,24 @@ class BankingSystemApplicationTests {
 
     @Test
     void transfer_money_non_existed_account() {
-        var sourceAccount = 1L;
-        var destinationAccount = 8567578311883312306L;
+        var sourceAccount = "1";
+        var destinationAccount = "8567578311883312306";
         boolean succeeded = bank.transferMoney(sourceAccount, destinationAccount, 154.75f);
         assertFalse(succeeded, "transfer should fail for a non existing account");
     }
 
     @Test
     void transfer_money_negative_input() {
-        var sourceAccount = 5323523150815117423L;
-        var destinationAccount = 8567578311883312306L;
+        var sourceAccount = "5323523150815117423";
+        var destinationAccount = "8567578311883312306";
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> bank.transferMoney(sourceAccount, destinationAccount, -154.75f), "expected getAccount to throw exception but didn't");
         assertEquals("Amount should not be negative or null", illegalArgumentException.getMessage());
     }
 
     @Test
     void transfer_money_not_enough_balance() {
-        var sourceAccount = 5323523150815117423L;
-        var destinationAccount = 8567578311883312306L;
+        var sourceAccount = "5323523150815117423";
+        var destinationAccount = "8567578311883312306";
         boolean succeeded = bank.transferMoney(sourceAccount, destinationAccount, 3000.0f);
         assertFalse(succeeded, "transfer should fail for when source account doesn't have enough money");
     }

@@ -13,10 +13,10 @@ public class IdGenerator {
      * generated UUID and use & with Long.MAX_VALUE, you can see why in <a href="https://stackoverflow.com/questions/15184820/how-to-generate-unique-positive-long-using-uuid/">this link</a>>
      * @return a positive,random, unique Long
      */
-    public static Long generateAccountUniqueId() {
+    public static String generateAccountUniqueId() {
          long generatedVal = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 
-        return generatedVal;
+        return String.valueOf(generatedVal);
     }
 
 }

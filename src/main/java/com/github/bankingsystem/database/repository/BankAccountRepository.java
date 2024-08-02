@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Transactional
 @Repository
-public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
+public interface BankAccountRepository extends JpaRepository<BankAccount, String> {
 }

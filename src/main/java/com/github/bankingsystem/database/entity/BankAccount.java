@@ -16,7 +16,7 @@ public class BankAccount implements Serializable {
 
     @Id
     @Column(name = "Account_Id")
-    private Long id;
+    private String id;
     @Column(name = "Holder_Name", nullable = false)
     private String name;
     @Column(name = "Amount", nullable = false)
