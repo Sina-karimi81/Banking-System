@@ -39,7 +39,7 @@ public class Bank {
 
             return savedAccount.getId();
         } catch (Exception e) {
-            System.out.println("exception occurred while trying to save account to database");
+            System.out.println("exception occurred while trying to save account to database: " + e.getMessage());
             return null;
         }
     }
@@ -63,7 +63,7 @@ public class Bank {
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("exception occurred while trying to get account: " + accountId + " from database");
+            System.out.println("exception occurred while trying to get account: " + accountId + " from database: " + e.getMessage());
             return null;
         }
     }
@@ -86,7 +86,7 @@ public class Bank {
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("exception occurred while trying to deposit money to account: " + accountId + " to database");
+            System.out.println("exception occurred while trying to deposit money to account: " + accountId + " to database: " + e.getMessage());
             return false;
         }
     }
@@ -114,7 +114,7 @@ public class Bank {
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("exception occurred while trying to withdraw money from account: " + accountId + " to database");
+            System.out.println("exception occurred while trying to withdraw money from account: " + accountId + " to database: " + e.getMessage());
             return false;
         }
     }
