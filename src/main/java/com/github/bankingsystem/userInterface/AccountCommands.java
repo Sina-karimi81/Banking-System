@@ -4,17 +4,15 @@ import com.github.bankingsystem.api.Account;
 import com.github.bankingsystem.api.AccountCreationInputDTO;
 import com.github.bankingsystem.business.Bank;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
+import java.util.concurrent.Future;
 
 import static com.github.bankingsystem.business.util.UserInput.*;
 
-@Async("executorService")
 @Service
-public class AccountCommands implements CommandLineRunner {
+public class AccountCommands {
 
     public final Bank bank;
 
@@ -23,8 +21,7 @@ public class AccountCommands implements CommandLineRunner {
         this.bank = bank;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    public Future<Void> run() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Welcome to Banking System");
@@ -77,7 +74,7 @@ public class AccountCommands implements CommandLineRunner {
                 transfer(sourceAccountId, destinationAccountId, transferAmount);
             } else if (choice == 6) {
                 System.out.println("Thanks for using our system!!!");
-                return;
+                return null;
             } else {
                 System.out.println("Command not recognized");
             }
