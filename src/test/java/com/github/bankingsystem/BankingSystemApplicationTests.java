@@ -9,7 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+        "spring.shell.interactive.enabled=false",
+        "spring.shell.script.enabled=false"
+})
 class BankingSystemApplicationTests {
 
     private final Bank bank;
@@ -220,5 +223,4 @@ class BankingSystemApplicationTests {
     }
 
     //todo: implement multi threading tests
-
 }

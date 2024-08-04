@@ -4,15 +4,12 @@ import com.github.bankingsystem.api.Account;
 import com.github.bankingsystem.api.AccountCreationInputDTO;
 import com.github.bankingsystem.business.transactions.TransactionFactory;
 import com.github.bankingsystem.business.util.IdGenerator;
-import com.github.bankingsystem.business.util.TableGenerator;
 import com.github.bankingsystem.database.entity.BankAccount;
 import com.github.bankingsystem.database.repository.BankAccountRepository;
 import com.github.bankingsystem.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.table.TableBuilder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,16 +22,6 @@ public class Bank {
     public Bank(BankAccountRepository bankAccountRepository, TransactionFactory transactionFactory) {
         this.bankAccountRepository = bankAccountRepository;
         this.transactionFactory = transactionFactory;
-    }
-
-    public void listAllAccounts() {
-        try {
-            List<BankAccount> all = bankAccountRepository.findAll();
-            TableBuilder tableBuilder = TableGenerator.listToArrayTableModel(all);
-            System.out.println(tableBuilder.build().render(120));
-        } catch (Exception e) {
-            System.out.println("exception occurred while trying to get all accounts from, database: \n" + e.getMessage());
-        }
     }
 
     public String createAccount(AccountCreationInputDTO accountInfo) throws IllegalArgumentException {

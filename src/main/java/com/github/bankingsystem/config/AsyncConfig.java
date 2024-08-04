@@ -2,15 +2,17 @@ package com.github.bankingsystem.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Configuration
+@EnableAsync
 public class AsyncConfig {
 
     @Bean(destroyMethod = "shutdown")
-    public ExecutorService taskExecutor() {
+    public ExecutorService executorService() {
         return Executors.newCachedThreadPool();
     }
 
