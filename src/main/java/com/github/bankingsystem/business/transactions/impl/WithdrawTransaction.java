@@ -32,7 +32,7 @@ public class WithdrawTransaction implements Transaction {
         }
 
         try {
-            Optional<BankAccount> accountById = bankAccountRepository.findById(accountId);
+            Optional<BankAccount> accountById = bankAccountRepository.findBankAccountById(accountId);
             if (accountById.isPresent()) {
                 BankAccount a = accountById.get();
                 if (a.getAmount() >= amount) {
@@ -43,7 +43,7 @@ public class WithdrawTransaction implements Transaction {
 
                     return true;
                 } else {
-                    System.out.println("Not Enough Balance!!!! in account: " + accountId);
+                    System.out.println("Not Enough Balance!!!! in account: " + accountId + " For " + Thread.currentThread().getName());
                     return false;
                 }
             } else {

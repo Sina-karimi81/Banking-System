@@ -1,1 +1,0 @@
-For account with Id 1 , transaction with type WITHDRAW was performed with amount 5000.000000

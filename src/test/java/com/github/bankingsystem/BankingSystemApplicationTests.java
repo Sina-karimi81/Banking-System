@@ -3,23 +3,28 @@ package com.github.bankingsystem;
 import com.github.bankingsystem.api.Account;
 import com.github.bankingsystem.api.AccountCreationInputDTO;
 import com.github.bankingsystem.business.Bank;
+import com.github.bankingsystem.userInterface.AccountFunctions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(properties = {
-        "spring.shell.interactive.enabled=false",
-        "spring.shell.script.enabled=false"
-})
+@SpringBootTest
 class BankingSystemApplicationTests {
 
     private final Bank bank;
+    private final AccountFunctions accountFunctions;
+    private final ExecutorService executorService;
 
     @Autowired
-    BankingSystemApplicationTests(Bank bank) {
+    BankingSystemApplicationTests(Bank bank, AccountFunctions accountFunctions, ExecutorService executorService) {
         this.bank = bank;
+        this.accountFunctions = accountFunctions;
+        this.executorService = executorService;
     }
 
     @Test
@@ -223,4 +228,90 @@ class BankingSystemApplicationTests {
     }
 
     //todo: implement multi threading tests
+    @Test
+    void create_account_async() throws InterruptedException {
+        executorService.submit(() -> accountFunctions.create("Test Async 1", 111.1f));
+        executorService.submit(() -> accountFunctions.create("Test Async 1", 222.2f));
+
+        executorService.shutdown();
+        boolean termination = executorService.awaitTermination(1, TimeUnit.SECONDS);
+
+        assertFalse(termination, "service calls must terminate unsuccessfully");
+        bank.listAllAccounts();
+    }
+
+    @Test
+    void get_account_balance_async() throws InterruptedException {
+        executorService.submit(() -> accountFunctions.balance("1"));
+        executorService.submit(() -> accountFunctions.balance("1"));
+        executorService.submit(() -> accountFunctions.balance("1"));
+        executorService.submit(() -> accountFunctions.balance("1"));
+        executorService.submit(() -> accountFunctions.balance("1"));
+
+        executorService.shutdown();
+        boolean termination = executorService.awaitTermination(1, TimeUnit.SECONDS);
+    }
+
+    @Test
+    void deposit_money_async() throws InterruptedException {
+        executorService.submit(() -> accountFunctions.deposit("1", 1500.0f));
+        executorService.submit(() -> accountFunctions.deposit("1", 2000.0f));
+        executorService.submit(() -> accountFunctions.deposit("1", 2000.0f));
+
+        executorService.shutdown();
+        executorService.awaitTermination(2000, TimeUnit.MILLISECONDS);
+        accountFunctions.balance("1");
+    }
+
+    @Test
+    void withdraw_money_async() throws InterruptedException {
+        executorService.submit(() -> accountFunctions.withdraw("1", 2500.0f));
+        executorService.submit(() -> accountFunctions.withdraw("1", 2500.0f));
+        executorService.submit(() -> accountFunctions.withdraw("1", 5000.0f));
+
+        executorService.shutdown();
+        executorService.awaitTermination(1500, TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    void transfer_money_async() throws InterruptedException {
+        for (int i=0; i < 10; i++) {
+            executorService.submit(() -> accountFunctions.transfer("1", "2", 5000.0f));
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(1500, TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    void withdraw_and_get_async() throws InterruptedException {
+        executorService.submit(() -> accountFunctions.balance("1"));
+        executorService.submit(() -> accountFunctions.withdraw("1", 2500.0f));
+        executorService.submit(() -> accountFunctions.withdraw("1", 750.0f));
+        executorService.submit(() -> accountFunctions.balance("1"));
+
+        executorService.shutdown();
+        executorService.awaitTermination(1500, TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    void deposit_and_get_async() throws InterruptedException {
+        executorService.submit(() -> accountFunctions.balance("1"));
+        executorService.submit(() -> accountFunctions.deposit("1", 2500.0f));
+        executorService.submit(() -> accountFunctions.deposit("1", 750.0f));
+        executorService.submit(() -> accountFunctions.balance("1"));
+
+        executorService.shutdown();
+        executorService.awaitTermination(1500, TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    void transfer_and_get_async() throws InterruptedException {
+        // todo: fix the dead lock situation
+        executorService.submit(() -> accountFunctions.transfer("1", "2", 2500.0f));
+        executorService.submit(() -> accountFunctions.transfer("2", "1",  750.0f));
+
+        executorService.shutdown();
+        executorService.awaitTermination(1500, TimeUnit.MILLISECONDS);
+    }
 }

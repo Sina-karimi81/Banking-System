@@ -32,7 +32,7 @@ public class DepositTransaction implements Transaction {
         }
 
         try {
-            Optional<BankAccount> accountById = bankAccountRepository.findById(accountId);
+            Optional<BankAccount> accountById = bankAccountRepository.findBankAccountById(accountId);
             if (accountById.isPresent()) {
                 BankAccount a = accountById.get();
                 a.setAmount(a.getAmount() + amount);

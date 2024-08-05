@@ -8,16 +8,16 @@ import java.util.concurrent.ExecutorService;
 @Service
 public class CommandLine implements CommandLineRunner {
 
-    private final AccountCommands accountCommands;
+    private final AccountFunctions accountFunctions;
     private final ExecutorService executorService;
 
-    public CommandLine(AccountCommands accountCommands, ExecutorService executorService) {
-        this.accountCommands = accountCommands;
+    public CommandLine(AccountFunctions accountFunctions, ExecutorService executorService) {
+        this.accountFunctions = accountFunctions;
         this.executorService = executorService;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        executorService.submit(accountCommands::run);
+        executorService.submit(accountFunctions);
     }
 }

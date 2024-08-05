@@ -7,21 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
-import java.util.concurrent.Future;
 
 import static com.github.bankingsystem.business.util.UserInput.*;
 
 @Service
-public class AccountCommands {
+public class AccountFunctions implements Runnable {
 
     public final Bank bank;
 
     @Autowired
-    public AccountCommands(Bank bank) {
+    public AccountFunctions(Bank bank) {
         this.bank = bank;
     }
 
-    public Future<Void> run() {
+    @Override
+    public void run() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Welcome to Banking System");
@@ -74,7 +74,7 @@ public class AccountCommands {
                 transfer(sourceAccountId, destinationAccountId, transferAmount);
             } else if (choice == 6) {
                 System.out.println("Thanks for using our system!!!");
-                return null;
+                return;
             } else {
                 System.out.println("Command not recognized");
             }
@@ -85,7 +85,7 @@ public class AccountCommands {
     public void create(String ownerName,  Float initialBalance) {
         try {
             String accountId = bank.createAccount(new AccountCreationInputDTO(ownerName, initialBalance));
-            System.out.println("generate accountId is: " + accountId);
+            System.out.println("generate accountId is: " + accountId + " For " + Thread.currentThread().getName());
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
         }
@@ -96,9 +96,9 @@ public class AccountCommands {
 
             Account account = bank.getAccount(accountId);
             if (account == null) {
-                System.out.println("No such account exists");
+                System.out.println("No such account exists " + Thread.currentThread().getName());
             } else {
-                System.out.println("account balance is " + account.getAmount());
+                System.out.println("account balance is " + account.getAmount() + " For " + Thread.currentThread().getName());
             }
 
         } catch (Exception e) {
@@ -110,9 +110,9 @@ public class AccountCommands {
         try {
 
             if (bank.depositMoney(accountId, amount)) {
-                System.out.println("Money deposited successfully");
+                System.out.println("Money deposited successfully " + Thread.currentThread().getName());
             } else {
-                System.out.println("Money was not deposited");
+                System.out.println("Money was not deposited " + Thread.currentThread().getName());
             }
 
         } catch (Exception e) {
@@ -124,9 +124,9 @@ public class AccountCommands {
         try {
 
             if (bank.withdrawMoney(accountId, amount)) {
-                System.out.println("Money withdrawn successfully");
+                System.out.println("Money withdrawn successfully: " + Thread.currentThread().getName());
             } else {
-                System.out.println("Money was not withdrawn");
+                System.out.println("Money was not withdrawn " + Thread.currentThread().getName());
             }
 
         } catch (Exception e) {
@@ -138,9 +138,9 @@ public class AccountCommands {
         try {
 
             if (bank.transferMoney(sourceAccountId, destinationAccountId, amount)) {
-                System.out.println("Money transferred successfully");
+                System.out.println("Money transferred successfully " + Thread.currentThread().getName());
             } else {
-                System.out.println("Money was not transferred");
+                System.out.println("Money was not transferred " + Thread.currentThread().getName());
             }
 
         } catch (Exception e) {

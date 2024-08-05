@@ -37,22 +37,27 @@ public class TransferTransaction implements Transaction {
         String destinationAccountNumber = split[1];
 
         try {
-            Optional<BankAccount> sourceAccount = bankAccountRepository.findById(sourceAccountNumber);
-            Optional<BankAccount> destinationAccount = bankAccountRepository.findById(destinationAccountNumber);
+            Optional<BankAccount> sourceAccount = bankAccountRepository.findBankAccountById(sourceAccountNumber);
+            Optional<BankAccount> destinationAccount = bankAccountRepository.findBankAccountById(destinationAccountNumber);
 
             if (sourceAccount.isPresent() && destinationAccount.isPresent()) {
                 BankAccount sourceAcc = sourceAccount.get();
                 BankAccount destinationAcc = destinationAccount.get();
 
-                sourceAcc.setAmount(sourceAcc.getAmount() - amount);
-                destinationAcc.setAmount(destinationAcc.getAmount() + amount);
+                if (sourceAcc.getAmount() >= amount) {
+                    sourceAcc.setAmount(sourceAcc.getAmount() - amount);
+                    destinationAcc.setAmount(destinationAcc.getAmount() + amount);
 
-                bankAccountRepository.saveAll(List.of(sourceAcc, destinationAcc));
-                transactionObserver.onTransaction(sourceAccountNumber, destinationAccountNumber, getType(), amount);
+                    bankAccountRepository.saveAll(List.of(sourceAcc, destinationAcc));
+                    transactionObserver.onTransaction(sourceAccountNumber, destinationAccountNumber, getType(), amount);
 
-                return true;
+                    return true;
+                } else {
+                    System.out.println("Not Enough Balance!!!! in account: " + accountId + " For " + Thread.currentThread().getName());
+                    return false;
+                }
             } else {
-                System.out.println("one of the accounts provided does not exist");
+                System.out.println("one of the accounts provided does not exist"  + " For " + Thread.currentThread().getName());
                 return false;
             }
         } catch (Exception e) {
