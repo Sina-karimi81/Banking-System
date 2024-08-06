@@ -5,6 +5,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutorService;
 
+/**
+ * This class is the starting point of the application since it is implementing the CommandLineRunner interface because
+ * spring will automatically call the {@link CommandLineRunner#run(String...)} method. I am using the class to create a
+ * thread for each instance of the application
+ */
 @Service
 public class CommandLine implements CommandLineRunner {
 

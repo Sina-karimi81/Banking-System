@@ -10,6 +10,10 @@ import java.util.Scanner;
 
 import static com.github.bankingsystem.business.util.UserInput.*;
 
+/**
+ * This class is the interface that the used will interact with. this class implements {@link Runnable} so that it's methods
+ * can be called asynchronously.
+ */
 @Service
 public class AccountFunctions implements Runnable {
 
@@ -22,13 +26,12 @@ public class AccountFunctions implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("Welcome to Banking System");
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Welcome to Banking System");
-
-        int choice = 0;
-
+        int choice;
         do {
+            System.out.println("\n");
             System.out.println(
                     """
                     Please choose an option:

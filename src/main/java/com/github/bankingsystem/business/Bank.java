@@ -34,7 +34,7 @@ public class Bank {
         System.out.println("Accounts: \n" + all);
     }
 
-    @Transactional(rollbackFor = {IllegalArgumentException.class}, propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String createAccount(AccountCreationInputDTO accountInfo) throws IllegalArgumentException {
         if (accountInfo.getOwnerName() == null || accountInfo.getOwnerName().isEmpty()) {
             throw new IllegalArgumentException("Owner's name should not be blank");
@@ -85,19 +85,19 @@ public class Bank {
         }
     }
 
-    @Transactional(rollbackFor = {IllegalArgumentException.class, IOException.class}, propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean depositMoney(String accountId, Float amount) throws IllegalArgumentException {
         return transactionFactory.getTransaction(TransactionType.DEPOSIT.name())
                 .performTransaction(accountId, amount);
     }
 
-    @Transactional(rollbackFor = {IllegalArgumentException.class, IOException.class}, propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean withdrawMoney(String accountId, Float amount) throws IllegalArgumentException {
         return transactionFactory.getTransaction(TransactionType.WITHDRAW.name())
                 .performTransaction(accountId, amount);
     }
 
-    @Transactional(rollbackFor = {IllegalArgumentException.class, IOException.class}, propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean transferMoney(String sourceAccount, String destinationAccount, Float amount) {
         return transactionFactory.getTransaction(TransactionType.TRANSFER.name())
                 .performTransaction(sourceAccount + "-" + destinationAccount, amount);

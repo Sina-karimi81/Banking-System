@@ -2,7 +2,6 @@ package com.github.bankingsystem.database.repository;
 
 import com.github.bankingsystem.database.entity.BankAccount;
 import jakarta.persistence.LockModeType;
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +10,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
+/**
+ * This class is repository class that is going to be our interface with the database. I am using a Pessimistic locking mechanism
+ * to lock a row in the database and prevent multiple threads from reading and writing to it at the same time
+ */
 @Repository
 public interface BankAccountRepository extends JpaRepository<BankAccount, String> {
 

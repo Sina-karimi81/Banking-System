@@ -61,7 +61,7 @@ public class TransferTransaction implements Transaction {
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("exception occurred while trying to transfer money from account " + sourceAccountNumber + "to account " + destinationAccountNumber + "\nexception: " + e.getMessage());
+            System.out.println("exception occurred while trying to transfer money from account " + sourceAccountNumber + " to account " + destinationAccountNumber + "\nexception: " + e.getMessage());
             return false;
         }
     }

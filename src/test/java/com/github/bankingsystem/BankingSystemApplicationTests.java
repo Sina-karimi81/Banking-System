@@ -146,7 +146,7 @@ class BankingSystemApplicationTests {
 
     @Test
     void deposit_money_non_existed_account() {
-        boolean succeeded = bank.depositMoney("3", 154.75f);
+        boolean succeeded = bank.depositMoney("4", 154.75f);
         assertFalse(succeeded, "deposit should fail for a non existing account");
     }
 
@@ -180,7 +180,7 @@ class BankingSystemApplicationTests {
 
     @Test
     void withdraw_money_non_existed_account() {
-        boolean succeeded = bank.withdrawMoney("3", 154.75f);
+        boolean succeeded = bank.withdrawMoney("4", 154.75f);
         assertFalse(succeeded, "deposit should fail for a non existing account");
     }
 
@@ -206,7 +206,7 @@ class BankingSystemApplicationTests {
     @Test
     void transfer_money_non_existed_account() {
         var sourceAccount = "1";
-        var destinationAccount = "3";
+        var destinationAccount = "4";
         boolean succeeded = bank.transferMoney(sourceAccount, destinationAccount, 154.75f);
         assertFalse(succeeded, "transfer should fail for a non existing account");
     }
@@ -307,11 +307,23 @@ class BankingSystemApplicationTests {
 
     @Test
     void transfer_and_get_async() throws InterruptedException {
-        // todo: fix the dead lock situation
         executorService.submit(() -> accountFunctions.transfer("1", "2", 2500.0f));
-        executorService.submit(() -> accountFunctions.transfer("2", "1",  750.0f));
+        executorService.submit(() -> accountFunctions.transfer("2", "3",  750.0f));
 
         executorService.shutdown();
         executorService.awaitTermination(1500, TimeUnit.MILLISECONDS);
+        accountFunctions.balance("2");
+    }
+
+    @Test
+    void withdraw_and_deposit_async() throws InterruptedException {
+        executorService.submit(() -> accountFunctions.deposit("1", 1000f));
+        executorService.submit(() -> accountFunctions.withdraw("1", 2500.0f));
+        executorService.submit(() -> accountFunctions.withdraw("1", 750.0f));
+        executorService.submit(() -> accountFunctions.deposit("1", 500f));
+
+        executorService.shutdown();
+        executorService.awaitTermination(1500, TimeUnit.MILLISECONDS);
+        accountFunctions.balance("1");
     }
 }
